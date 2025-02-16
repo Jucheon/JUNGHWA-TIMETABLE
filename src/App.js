@@ -17,10 +17,24 @@ function App() {
       return acc;
     }, {})
   );
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showError = (message) => {
+    setErrorMessage(message);
+    setTimeout(() => setErrorMessage(""), 3000); // 3초 후 자동 삭제
+  };
 
   const addToTimetable = (course, category) => {
     const startPeriod = parseInt(course.period.split("~")[0]) - 1;
     const endPeriod = parseInt(course.period.split("~")[1]) - 1;
+
+    // 중복 확인: 동일한 요일, 동일한 시간에 이미 같은 수업이 있으면 추가 불가능
+    for (let i = startPeriod; i <= endPeriod; i++) {
+      if (timetable[course.day][i] !== null) {
+        showError("중복된 시간이 존재합니다.");
+        return;
+      }
+    }
 
     setTimetable((prev) => {
       const newTimetable = { ...prev };
@@ -45,23 +59,43 @@ function App() {
   };
 
   return (
-    <div>
+    <div style={{ position: "relative", textAlign: "center" }}>
       <h1>시간표 웹앱</h1>
 
-      {/* 빈 시간표 (고정 너비 설정) */}
-      <table border="1" style={{ width: "100%", tableLayout: "fixed" }}>
+      {/* 중복 경고 메시지 */}
+      {errorMessage && (
+        <div
+          style={{
+            position: "absolute",
+            top: "10%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "#ff4444",
+            color: "#fff",
+            padding: "10px",
+            borderRadius: "5px",
+            fontWeight: "bold",
+            zIndex: 1000
+          }}
+        >
+          {errorMessage}
+        </div>
+      )}
+
+      {/* 빈 시간표 (구분선 추가) */}
+      <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
         <thead>
           <tr>
-            <th style={{ width: "50px" }}>교시</th>
+            <th style={{ width: "50px", border: "1px solid black" }}>교시</th>
             {days.map((day) => (
-              <th key={day} style={{ width: "18%" }}>{day}</th>
+              <th key={day} style={{ width: "18%", border: "1px solid black" }}>{day}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {periods.map((period) => (
             <tr key={period}>
-              <td>{period}교시</td>
+              <td style={{ border: "1px solid black" }}>{period}교시</td>
               {days.map((day) => {
                 const course = timetable[day][period - 1];
                 const isStartPeriod = course && course.startPeriod === period - 1;
@@ -76,13 +110,14 @@ function App() {
                       textAlign: "center",
                       verticalAlign: "middle",
                       fontWeight: "bold",
+                      border: "1px solid black"
                     }}
                     rowSpan={course.endPeriod - course.startPeriod + 1}
                     onClick={() => removeFromTimetable(day, period - 1)}
                   >
                     {course.subject}
                   </td>
-                ) : null;
+                ) : <td key={`${day}-${period}`} style={{ border: "1px solid black" }}></td>;
               })}
             </tr>
           ))}
