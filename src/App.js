@@ -23,12 +23,12 @@ function App() {
 
   const showError = (message) => {
     setErrorMessage(message);
-    setTimeout(() => setErrorMessage(""), 3000); // 3초 후 자동 삭제
+    setTimeout(() => setErrorMessage(""), 3000);
   };
 
   const showSuccess = (message) => {
     setSuccessMessage(message);
-    setTimeout(() => setSuccessMessage(""), 3000); // 3초 후 자동 삭제
+    setTimeout(() => setSuccessMessage(""), 3000);
   };
 
   const addToTimetable = (course, category) => {
@@ -41,8 +41,15 @@ function App() {
     const startPeriod = parseInt(course.period.split("~")[0]) - 1;
     const endPeriod = parseInt(course.period.split("~")[1]) - 1;
 
+    // ✅ 요일이 정확하게 인식되는지 확인
+    const day = days.find((d) => d === course.day);
+    if (!day) {
+      showError("잘못된 요일 데이터입니다.");
+      return;
+    }
+
     for (let i = startPeriod; i <= endPeriod; i++) {
-      if (timetable[course.day][i] !== null) {
+      if (timetable[day][i] !== null) {
         showError("중복된 시간이 존재합니다.");
         return;
       }
@@ -51,7 +58,7 @@ function App() {
     setTimetable((prev) => {
       const newTimetable = { ...prev };
       for (let i = startPeriod; i <= endPeriod; i++) {
-        newTimetable[course.day][i] = { ...course, startPeriod, endPeriod, category };
+        newTimetable[day][i] = { ...course, startPeriod, endPeriod, category };
       }
       return newTimetable;
     });
@@ -124,7 +131,7 @@ function App() {
         </div>
       )}
 
-      {/* 빈 시간표 복원 */}
+      {/* 빈 시간표 */}
       <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -167,24 +174,6 @@ function App() {
           ))}
         </tbody>
       </table>
-
-      {onlineCourse && (
-        <div
-          style={{
-            marginTop: "10px",
-            padding: "10px",
-            background: "#d3d3d3",
-            width: "300px",
-            margin: "auto",
-            borderRadius: "5px",
-            cursor: "pointer",
-            fontWeight: "bold"
-          }}
-          onClick={removeOnlineCourse}
-        >
-          {onlineCourse.subject} (클릭하면 삭제)
-        </div>
-      )}
     </div>
   );
 }
