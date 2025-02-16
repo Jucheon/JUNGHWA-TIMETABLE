@@ -18,13 +18,26 @@ function App() {
     }, {})
   );
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [onlineCourse, setOnlineCourse] = useState(null);
 
   const showError = (message) => {
     setErrorMessage(message);
     setTimeout(() => setErrorMessage(""), 3000); // 3초 후 자동 삭제
   };
 
+  const showSuccess = (message) => {
+    setSuccessMessage(message);
+    setTimeout(() => setSuccessMessage(""), 3000); // 3초 후 자동 삭제
+  };
+
   const addToTimetable = (course, category) => {
+    if (course.subject === "행복한시민되기") {
+      setOnlineCourse({ subject: "행복한시민되기(온라인, 2학점)", category });
+      showSuccess("수업을 추가하였습니다.");
+      return;
+    }
+
     const startPeriod = parseInt(course.period.split("~")[0]) - 1;
     const endPeriod = parseInt(course.period.split("~")[1]) - 1;
 
@@ -43,6 +56,8 @@ function App() {
       }
       return newTimetable;
     });
+
+    showSuccess("수업을 추가하였습니다.");
   };
 
   const removeFromTimetable = (day, period) => {
@@ -56,6 +71,10 @@ function App() {
       }
       return newTimetable;
     });
+  };
+
+  const removeOnlineCourse = () => {
+    setOnlineCourse(null);
   };
 
   return (
@@ -85,51 +104,28 @@ function App() {
         </div>
       )}
 
-      {/* 빈 시간표 (기본 높이 증가) */}
-      <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={{ width: "50px", border: "1px solid black" }}>교시</th>
-            {days.map((day) => (
-              <th key={day} style={{ width: `${100 / days.length}%`, border: "1px solid black" }}>{day}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {periods.map((period) => (
-            <tr key={period} style={{ height: "60px" }}> {/* 행 기본 높이 증가 */}
-              <td style={{ border: "1px solid black" }}>{period}교시</td>
-              {days.map((day) => {
-                const course = timetable[day][period - 1];
-                const isStartPeriod = course && course.startPeriod === period - 1;
-                const bgColor = course ? categoryColors[course.category] : "#fff";
-
-                // 텍스트 길이에 따라 글자 크기 조절
-                const fontSize = course && course.subject.length > 10 ? "12px" : "16px";
-
-                return isStartPeriod ? (
-                  <td
-                    key={`${day}-${period}`}
-                    style={{
-                      cursor: "pointer",
-                      background: bgColor,
-                      textAlign: "center",
-                      verticalAlign: "middle",
-                      fontWeight: "bold",
-                      border: "1px solid black",
-                      fontSize: fontSize,
-                    }}
-                    rowSpan={course.endPeriod - course.startPeriod + 1}
-                    onClick={() => removeFromTimetable(day, period - 1)}
-                  >
-                    {course.subject}
-                  </td>
-                ) : <td key={`${day}-${period}`} style={{ border: "1px solid black" }}></td>;
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* 수업 추가 성공 메시지 (화면 중앙 고정, 검정 배경) */}
+      {successMessage && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "#000",
+            color: "#fff",
+            padding: "15px",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            zIndex: 1000,
+            textAlign: "center",
+            width: "300px",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
 
       {/* 수업 리스트 */}
       {Object.entries(courseData).map(([category, courses]) => (
@@ -165,6 +161,25 @@ function App() {
           </table>
         </div>
       ))}
+
+      {/* 온라인 수업 표시 */}
+      {onlineCourse && (
+        <div
+          style={{
+            marginTop: "10px",
+            padding: "10px",
+            background: "#d3d3d3",
+            width: "300px",
+            margin: "auto",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+          onClick={removeOnlineCourse}
+        >
+          {onlineCourse.subject} (클릭하면 삭제)
+        </div>
+      )}
     </div>
   );
 }
