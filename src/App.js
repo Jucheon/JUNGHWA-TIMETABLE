@@ -41,7 +41,6 @@ function App() {
     const startPeriod = parseInt(course.period.split("~")[0]) - 1;
     const endPeriod = parseInt(course.period.split("~")[1]) - 1;
 
-    // 중복 확인: 동일한 요일, 동일한 시간에 이미 같은 수업이 있으면 추가 불가능
     for (let i = startPeriod; i <= endPeriod; i++) {
       if (timetable[course.day][i] !== null) {
         showError("중복된 시간이 존재합니다.");
@@ -64,7 +63,7 @@ function App() {
     setTimetable((prev) => {
       const newTimetable = { ...prev };
       const course = newTimetable[day][period];
-      if (!course) return prev; // 빈 칸 클릭 방지
+      if (!course) return prev;
 
       for (let i = course.startPeriod; i <= course.endPeriod; i++) {
         newTimetable[day][i] = null;
@@ -81,7 +80,6 @@ function App() {
     <div style={{ position: "relative", textAlign: "center" }}>
       <h1>정화예대 25-1 시간표 도우미</h1>
 
-      {/* 중복 경고 메시지 (화면 중앙 고정) */}
       {errorMessage && (
         <div
           style={{
@@ -104,7 +102,6 @@ function App() {
         </div>
       )}
 
-      {/* 수업 추가 성공 메시지 (화면 중앙 고정, 검정 배경) */}
       {successMessage && (
         <div
           style={{
@@ -127,42 +124,50 @@ function App() {
         </div>
       )}
 
-      {/* 수업 리스트 */}
-      {Object.entries(courseData).map(([category, courses]) => (
-        <div key={category}>
-          <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
-          <table border="1">
-            <thead>
-              <tr>
-                <th>과목명</th>
-                <th>교수</th>
-                <th>요일</th>
-                <th>교시</th>
-                <th>강의실</th>
-                <th>학점</th>
-                <th>추가</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((course, index) => (
-                <tr key={index}>
-                  <td>{course.subject}</td>
-                  <td>{course.professor}</td>
-                  <td>{course.day}</td>
-                  <td>{course.period}</td>
-                  <td>{course.location}</td>
-                  <td>{course.credits}</td>
-                  <td>
-                    <button onClick={() => addToTimetable(course, category)}>추가</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
+      {/* 빈 시간표 복원 */}
+      <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={{ width: "50px", border: "1px solid black" }}>교시</th>
+            {days.map((day) => (
+              <th key={day} style={{ width: `${100 / days.length}%`, border: "1px solid black" }}>{day}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {periods.map((period) => (
+            <tr key={period} style={{ height: "60px" }}>
+              <td style={{ border: "1px solid black" }}>{period}교시</td>
+              {days.map((day) => {
+                const course = timetable[day][period - 1];
+                const isStartPeriod = course && course.startPeriod === period - 1;
+                const bgColor = course ? categoryColors[course.category] : "#fff";
+                const fontSize = course && course.subject.length > 10 ? "12px" : "16px";
 
-      {/* 온라인 수업 표시 */}
+                return isStartPeriod ? (
+                  <td
+                    key={`${day}-${period}`}
+                    style={{
+                      cursor: "pointer",
+                      background: bgColor,
+                      textAlign: "center",
+                      verticalAlign: "middle",
+                      fontWeight: "bold",
+                      border: "1px solid black",
+                      fontSize: fontSize,
+                    }}
+                    rowSpan={course.endPeriod - course.startPeriod + 1}
+                    onClick={() => removeFromTimetable(day, period - 1)}
+                  >
+                    {course.subject}
+                  </td>
+                ) : <td key={`${day}-${period}`} style={{ border: "1px solid black" }}></td>;
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       {onlineCourse && (
         <div
           style={{
