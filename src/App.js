@@ -85,7 +85,7 @@ function App() {
         </div>
       )}
 
-      {/* 빈 시간표 (구분선 추가 및 금요일 오른쪽 열 문제 해결) */}
+      {/* 빈 시간표 (행 높이 고정) */}
       <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -97,12 +97,15 @@ function App() {
         </thead>
         <tbody>
           {periods.map((period) => (
-            <tr key={period}>
+            <tr key={period} style={{ height: "50px" }}> {/* 행 높이 고정 */}
               <td style={{ border: "1px solid black" }}>{period}교시</td>
               {days.map((day) => {
                 const course = timetable[day][period - 1];
                 const isStartPeriod = course && course.startPeriod === period - 1;
                 const bgColor = course ? categoryColors[course.category] : "#fff";
+
+                // 텍스트 길이에 따라 글자 크기 조절
+                const fontSize = course && course.subject.length > 10 ? "12px" : "16px";
 
                 return isStartPeriod ? (
                   <td
@@ -113,7 +116,8 @@ function App() {
                       textAlign: "center",
                       verticalAlign: "middle",
                       fontWeight: "bold",
-                      border: "1px solid black"
+                      border: "1px solid black",
+                      fontSize: fontSize,
                     }}
                     rowSpan={course.endPeriod - course.startPeriod + 1}
                     onClick={() => removeFromTimetable(day, period - 1)}
