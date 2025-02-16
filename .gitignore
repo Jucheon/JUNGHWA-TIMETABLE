@@ -1,0 +1,9 @@
+# 시스템 파일 제외
+.DS_Store
+Thumbs.db
+node_modules/
+.env
+*.log
+.cache
+.vscode/
+.idea/
