@@ -85,7 +85,7 @@ function App() {
         </div>
       )}
 
-      {/* 빈 시간표 (행 높이 고정) */}
+      {/* 빈 시간표 (기본 높이 증가) */}
       <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -97,7 +97,7 @@ function App() {
         </thead>
         <tbody>
           {periods.map((period) => (
-            <tr key={period} style={{ height: "50px" }}> {/* 행 높이 고정 */}
+            <tr key={period} style={{ height: "60px" }}> {/* 행 기본 높이 증가 */}
               <td style={{ border: "1px solid black" }}>{period}교시</td>
               {days.map((day) => {
                 const course = timetable[day][period - 1];
