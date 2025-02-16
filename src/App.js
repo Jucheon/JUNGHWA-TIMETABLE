@@ -60,35 +60,38 @@ function App() {
 
   return (
     <div style={{ position: "relative", textAlign: "center" }}>
-      <h1>시간표 웹앱</h1>
+      <h1>정화예대 25-1 시간표 도우미</h1>
 
-      {/* 중복 경고 메시지 */}
+      {/* 중복 경고 메시지 (화면 중앙 고정) */}
       {errorMessage && (
         <div
           style={{
-            position: "absolute",
-            top: "10%",
+            position: "fixed",
+            top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
             background: "#ff4444",
             color: "#fff",
-            padding: "10px",
-            borderRadius: "5px",
+            padding: "15px",
+            borderRadius: "8px",
             fontWeight: "bold",
-            zIndex: 1000
+            zIndex: 1000,
+            textAlign: "center",
+            width: "300px",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
           }}
         >
           {errorMessage}
         </div>
       )}
 
-      {/* 빈 시간표 (구분선 추가) */}
+      {/* 빈 시간표 (구분선 추가 및 금요일 오른쪽 열 문제 해결) */}
       <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
         <thead>
           <tr>
             <th style={{ width: "50px", border: "1px solid black" }}>교시</th>
             {days.map((day) => (
-              <th key={day} style={{ width: "18%", border: "1px solid black" }}>{day}</th>
+              <th key={day} style={{ width: `${100 / days.length}%`, border: "1px solid black" }}>{day}</th>
             ))}
           </tr>
         </thead>
