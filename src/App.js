@@ -67,24 +67,22 @@ function App() {
                 const isStartPeriod = course && course.startPeriod === period - 1;
                 const bgColor = course ? categoryColors[course.category] : "#fff";
 
-                return (
-                  isStartPeriod ? (
-                    <td
-                      key={`${day}-${period}`}
-                      style={{
-                        cursor: "pointer",
-                        background: bgColor,
-                        textAlign: "center",
-                        verticalAlign: "middle",
-                        fontWeight: "bold",
-                      }}
-                      rowSpan={course.endPeriod - course.startPeriod + 1}
-                      onClick={() => removeFromTimetable(day, period - 1)}
-                    >
-                      {course.subject}
-                    </td>
-                  ) : null
-                );
+                return isStartPeriod ? (
+                  <td
+                    key={`${day}-${period}`}
+                    style={{
+                      cursor: "pointer",
+                      background: bgColor,
+                      textAlign: "center",
+                      verticalAlign: "middle",
+                      fontWeight: "bold",
+                    }}
+                    rowSpan={course.endPeriod - course.startPeriod + 1}
+                    onClick={() => removeFromTimetable(day, period - 1)}
+                  >
+                    {course.subject}
+                  </td>
+                ) : null;
               })}
             </tr>
           ))}
@@ -92,5 +90,41 @@ function App() {
       </table>
 
       {/* 수업 리스트 */}
-      {Object.entries(courseData).map(([category, courses]) =>
+      {Object.entries(courseData).map(([category, courses]) => (
+        <div key={category}>
+          <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
+          <table border="1">
+            <thead>
+              <tr>
+                <th>과목명</th>
+                <th>교수</th>
+                <th>요일</th>
+                <th>교시</th>
+                <th>강의실</th>
+                <th>학점</th>
+                <th>추가</th>
+              </tr>
+            </thead>
+            <tbody>
+              {courses.map((course, index) => (
+                <tr key={index}>
+                  <td>{course.subject}</td>
+                  <td>{course.professor}</td>
+                  <td>{course.day}</td>
+                  <td>{course.period}</td>
+                  <td>{course.location}</td>
+                  <td>{course.credits}</td>
+                  <td>
+                    <button onClick={() => addToTimetable(course, category)}>추가</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </div>
+  );
+}
 
+export default App;
