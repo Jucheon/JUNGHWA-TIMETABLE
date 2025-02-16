@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
+import { Card, CardContent } from "./components/ui/card";  
+import { Button } from "./components/ui/button";  
+import { Select } from "./components/ui/select";  
 import { motion } from "framer-motion";
 
 const days = ["월", "화", "수", "목", "금"];
