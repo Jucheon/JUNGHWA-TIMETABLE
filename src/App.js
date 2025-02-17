@@ -41,7 +41,7 @@ function App() {
     const startPeriod = parseInt(course.period.split("~")[0]) - 1;
     const endPeriod = parseInt(course.period.split("~")[1]) - 1;
 
-    // ✅ 요일이 정확하게 인식되는지 확인
+    // ✅ 요일이 정확하게 인식되는지 확인 (잘못된 요일이면 추가 안 되도록 처리)
     if (!days.includes(course.day)) {
       showError("잘못된 요일 데이터입니다.");
       return;
@@ -174,7 +174,7 @@ function App() {
         </tbody>
       </table>
 
-      {/* 수업 목록 복원 */}
+      {/* 수업 목록 완전 복원 */}
       {Object.entries(courseData).map(([category, courses]) => (
         <div key={category}>
           <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
