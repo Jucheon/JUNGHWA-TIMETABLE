@@ -42,14 +42,13 @@ function App() {
     const endPeriod = parseInt(course.period.split("~")[1]) - 1;
 
     // ✅ 요일이 정확하게 인식되는지 확인
-    const day = days.find((d) => d === course.day);
-    if (!day) {
+    if (!days.includes(course.day)) {
       showError("잘못된 요일 데이터입니다.");
       return;
     }
 
     for (let i = startPeriod; i <= endPeriod; i++) {
-      if (timetable[day][i] !== null) {
+      if (timetable[course.day][i] !== null) {
         showError("중복된 시간이 존재합니다.");
         return;
       }
@@ -58,7 +57,7 @@ function App() {
     setTimetable((prev) => {
       const newTimetable = { ...prev };
       for (let i = startPeriod; i <= endPeriod; i++) {
-        newTimetable[day][i] = { ...course, startPeriod, endPeriod, category };
+        newTimetable[course.day][i] = { ...course, startPeriod, endPeriod, category };
       }
       return newTimetable;
     });
@@ -174,6 +173,41 @@ function App() {
           ))}
         </tbody>
       </table>
+
+      {/* 수업 목록 복원 */}
+      {Object.entries(courseData).map(([category, courses]) => (
+        <div key={category}>
+          <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
+          <table border="1">
+            <thead>
+              <tr>
+                <th>과목명</th>
+                <th>교수</th>
+                <th>요일</th>
+                <th>교시</th>
+                <th>강의실</th>
+                <th>학점</th>
+                <th>추가</th>
+              </tr>
+            </thead>
+            <tbody>
+              {courses.map((course, index) => (
+                <tr key={index}>
+                  <td>{course.subject}</td>
+                  <td>{course.professor}</td>
+                  <td>{course.day}</td>
+                  <td>{course.period}</td>
+                  <td>{course.location}</td>
+                  <td>{course.credits}</td>
+                  <td>
+                    <button onClick={() => addToTimetable(course, category)}>추가</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
     </div>
   );
 }
