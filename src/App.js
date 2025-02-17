@@ -33,11 +33,17 @@ function App() {
 
   const calculateCredits = () => {
     let totalCredits = 0;
+    const countedCourses = new Set(); // 중복 계산 방지
+
     days.forEach((day) => {
       timetable[day].forEach((course) => {
-        if (course) totalCredits += course.credits;
+        if (course && !countedCourses.has(`${course.subject}-${day}`)) {
+          totalCredits += course.credits; // 정확한 학점 추가
+          countedCourses.add(`${course.subject}-${day}`);
+        }
       });
     });
+
     if (onlineCourse) totalCredits += 2; // 온라인 수업 포함
     return totalCredits;
   };
@@ -145,7 +151,7 @@ function App() {
         </div>
       )}
 
-      {/* 빈 시간표 복원 */}
+      {/* 빈 시간표 */}
       <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -188,41 +194,6 @@ function App() {
           ))}
         </tbody>
       </table>
-
-      {/* 수업 목록 완전 복원 */}
-      {Object.entries(courseData).map(([category, courses]) => (
-        <div key={category}>
-          <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
-          <table border="1">
-            <thead>
-              <tr>
-                <th>과목명</th>
-                <th>교수</th>
-                <th>요일</th>
-                <th>교시</th>
-                <th>강의실</th>
-                <th>학점</th>
-                <th>추가</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((course, index) => (
-                <tr key={index}>
-                  <td>{course.subject}</td>
-                  <td>{course.professor}</td>
-                  <td>{course.day}</td>
-                  <td>{course.period}</td>
-                  <td>{course.location}</td>
-                  <td>{course.credits}</td>
-                  <td>
-                    <button onClick={() => addToTimetable(course, category)}>추가</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
     </div>
   );
 }
