@@ -107,45 +107,41 @@ function App() {
       </div>
 
       {errorMessage && (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            background: "#ff4444",
-            color: "#fff",
-            padding: "15px",
-            borderRadius: "8px",
-            fontWeight: "bold",
-            zIndex: 1000,
-            textAlign: "center",
-            width: "300px",
-            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
-          }}
-        >
+        <div style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          background: "#ff4444",
+          color: "#fff",
+          padding: "15px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          zIndex: 1000,
+          textAlign: "center",
+          width: "300px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
+        }}>
           {errorMessage}
         </div>
       )}
 
       {successMessage && (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            background: "#000",
-            color: "#fff",
-            padding: "15px",
-            borderRadius: "8px",
-            fontWeight: "bold",
-            zIndex: 1000,
-            textAlign: "center",
-            width: "300px",
-            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
-          }}
-        >
+        <div style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          background: "#000",
+          color: "#fff",
+          padding: "15px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          zIndex: 1000,
+          textAlign: "center",
+          width: "300px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
+        }}>
           {successMessage}
         </div>
       )}
@@ -166,24 +162,16 @@ function App() {
               <td style={{ border: "1px solid black" }}>{period}교시</td>
               {days.map((day) => {
                 const course = timetable[day][period - 1];
-                const isStartPeriod = course && course.startPeriod === period - 1;
-                const bgColor = course ? categoryColors[course.category] : "#fff";
-
-                return isStartPeriod ? (
-                  <td
-                    key={`${day}-${period}`}
-                    style={{
-                      cursor: "pointer",
-                      background: bgColor,
-                      textAlign: "center",
-                      verticalAlign: "middle",
-                      fontWeight: "bold",
-                      border: "1px solid black",
-                      padding: "5px"
-                    }}
-                    rowSpan={course.endPeriod - course.startPeriod + 1}
-                    onClick={() => removeFromTimetable(day, period - 1)}
-                  >
+                return course ? (
+                  <td key={`${day}-${period}`} style={{
+                    cursor: "pointer",
+                    background: categoryColors[course.category],
+                    textAlign: "center",
+                    verticalAlign: "middle",
+                    fontWeight: "bold",
+                    border: "1px solid black",
+                    padding: "5px"
+                  }} rowSpan={course.endPeriod - course.startPeriod + 1} onClick={() => removeFromTimetable(day, period - 1)}>
                     {course.subject}
                     <br />
                     <span style={{ fontSize: "12px", fontWeight: "normal" }}>{course.professor}</span>
@@ -194,6 +182,39 @@ function App() {
           ))}
         </tbody>
       </table>
+
+      {/* 수업 목록 완전 복원 */}
+      {Object.entries(courseData).map(([category, courses]) => (
+        <div key={category}>
+          <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
+          <table border="1" style={{ margin: "auto", marginBottom: "20px" }}>
+            <thead>
+              <tr>
+                <th>과목명</th>
+                <th>교수</th>
+                <th>요일</th>
+                <th>교시</th>
+                <th>강의실</th>
+                <th>학점</th>
+                <th>추가</th>
+              </tr>
+            </thead>
+            <tbody>
+              {courses.map((course, index) => (
+                <tr key={index}>
+                  <td>{course.subject}</td>
+                  <td>{course.professor}</td>
+                  <td>{course.day}</td>
+                  <td>{course.period}</td>
+                  <td>{course.location}</td>
+                  <td>{course.credits}</td>
+                  <td><button onClick={() => addToTimetable(course, category)}>추가</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
     </div>
   );
 }
