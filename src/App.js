@@ -183,7 +183,7 @@ function App() {
         </tbody>
       </table>
 
-      {/* 수업 목록 완전 복원 */}
+      {/* 수업 목록 유지 */}
       {Object.entries(courseData).map(([category, courses]) => (
         <div key={category}>
           <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
