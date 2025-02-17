@@ -31,6 +31,17 @@ function App() {
     setTimeout(() => setSuccessMessage(""), 3000);
   };
 
+  const calculateCredits = () => {
+    let totalCredits = 0;
+    days.forEach((day) => {
+      timetable[day].forEach((course) => {
+        if (course) totalCredits += course.credits;
+      });
+    });
+    if (onlineCourse) totalCredits += 2; // 온라인 수업 포함
+    return totalCredits;
+  };
+
   const addToTimetable = (course, category) => {
     if (course.subject === "행복한시민되기") {
       setOnlineCourse({ subject: "행복한시민되기(온라인, 2학점)", category });
@@ -41,7 +52,6 @@ function App() {
     const startPeriod = parseInt(course.period.split("~")[0]) - 1;
     const endPeriod = parseInt(course.period.split("~")[1]) - 1;
 
-    // ✅ 요일이 정확하게 인식되는지 확인 (잘못된 요일이면 추가 안 되도록 처리)
     if (!days.includes(course.day)) {
       showError("잘못된 요일 데이터입니다.");
       return;
@@ -84,7 +94,12 @@ function App() {
 
   return (
     <div style={{ position: "relative", textAlign: "center" }}>
-      <h1>정화예대 25-1 시간표 도우미</h1>
+      <h1 style={{ marginBottom: "30px" }}>정화예대 25-1 시간표 도우미</h1>
+
+      {/* 학점 계산기 */}
+      <div style={{ position: "absolute", top: "20px", right: "20px", fontSize: "18px", fontWeight: "bold" }}>
+        현재: {calculateCredits()}학점
+      </div>
 
       {errorMessage && (
         <div
@@ -174,40 +189,24 @@ function App() {
         </tbody>
       </table>
 
-      {/* 수업 목록 완전 복원 */}
-      {Object.entries(courseData).map(([category, courses]) => (
-        <div key={category}>
-          <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
-          <table border="1">
-            <thead>
-              <tr>
-                <th>과목명</th>
-                <th>교수</th>
-                <th>요일</th>
-                <th>교시</th>
-                <th>강의실</th>
-                <th>학점</th>
-                <th>추가</th>
-              </tr>
-            </thead>
-            <tbody>
-              {courses.map((course, index) => (
-                <tr key={index}>
-                  <td>{course.subject}</td>
-                  <td>{course.professor}</td>
-                  <td>{course.day}</td>
-                  <td>{course.period}</td>
-                  <td>{course.location}</td>
-                  <td>{course.credits}</td>
-                  <td>
-                    <button onClick={() => addToTimetable(course, category)}>추가</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* 온라인 수업 행 */}
+      {onlineCourse && (
+        <div
+          style={{
+            marginTop: "10px",
+            padding: "10px",
+            background: "#d3d3d3",
+            width: "300px",
+            margin: "auto",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+          onClick={removeOnlineCourse}
+        >
+          {onlineCourse.subject} (클릭하면 삭제)
         </div>
-      ))}
+      )}
     </div>
   );
 }
