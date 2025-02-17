@@ -33,7 +33,6 @@ function App() {
 
   const calculateCredits = () => {
     let totalCredits = 0;
-
     days.forEach((day) => {
       timetable[day].forEach((course) => {
         if (course) {
