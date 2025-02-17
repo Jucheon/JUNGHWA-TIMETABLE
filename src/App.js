@@ -145,7 +145,51 @@ function App() {
         </div>
       )}
 
-      {/* 수업 목록 복원 */}
+      {/* 빈 시간표 복원 */}
+      <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={{ width: "50px", border: "1px solid black" }}>교시</th>
+            {days.map((day) => (
+              <th key={day} style={{ width: `${100 / days.length}%`, border: "1px solid black" }}>{day}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {periods.map((period) => (
+            <tr key={period} style={{ height: "60px" }}>
+              <td style={{ border: "1px solid black" }}>{period}교시</td>
+              {days.map((day) => {
+                const course = timetable[day][period - 1];
+                const isStartPeriod = course && course.startPeriod === period - 1;
+                const bgColor = course ? categoryColors[course.category] : "#fff";
+                const fontSize = course && course.subject.length > 10 ? "12px" : "16px";
+
+                return isStartPeriod ? (
+                  <td
+                    key={`${day}-${period}`}
+                    style={{
+                      cursor: "pointer",
+                      background: bgColor,
+                      textAlign: "center",
+                      verticalAlign: "middle",
+                      fontWeight: "bold",
+                      border: "1px solid black",
+                      fontSize: fontSize,
+                    }}
+                    rowSpan={course.endPeriod - course.startPeriod + 1}
+                    onClick={() => removeFromTimetable(day, period - 1)}
+                  >
+                    {course.subject}
+                  </td>
+                ) : <td key={`${day}-${period}`} style={{ border: "1px solid black" }}></td>;
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* 수업 목록 완전 복원 */}
       {Object.entries(courseData).map(([category, courses]) => (
         <div key={category}>
           <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
@@ -179,25 +223,6 @@ function App() {
           </table>
         </div>
       ))}
-
-      {/* 온라인 수업 행 */}
-      {onlineCourse && (
-        <div
-          style={{
-            marginTop: "10px",
-            padding: "10px",
-            background: "#d3d3d3",
-            width: "300px",
-            margin: "auto",
-            borderRadius: "5px",
-            cursor: "pointer",
-            fontWeight: "bold"
-          }}
-          onClick={removeOnlineCourse}
-        >
-          {onlineCourse.subject} (클릭하면 삭제)
-        </div>
-      )}
     </div>
   );
 }
