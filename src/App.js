@@ -33,18 +33,18 @@ function App() {
 
   const calculateCredits = () => {
     let totalCredits = 0;
-    const countedCourses = new Set(); // 중복 계산 방지
+    const countedCourses = new Set();
 
     days.forEach((day) => {
       timetable[day].forEach((course) => {
         if (course && !countedCourses.has(`${course.subject}-${day}`)) {
-          totalCredits += course.credits; // 정확한 학점 추가
+          totalCredits += course.credits;
           countedCourses.add(`${course.subject}-${day}`);
         }
       });
     });
 
-    if (onlineCourse) totalCredits += 2; // 온라인 수업 포함
+    if (onlineCourse) totalCredits += 2;
     return totalCredits;
   };
 
@@ -100,10 +100,10 @@ function App() {
 
   return (
     <div style={{ position: "relative", textAlign: "center" }}>
-      <h1 style={{ marginBottom: "30px" }}>정화예대 25-1 시간표 도우미</h1>
+      <h1 style={{ marginBottom: "40px" }}>정화예대 25-1 시간표 도우미</h1>
 
-      {/* 학점 계산기 */}
-      <div style={{ position: "absolute", top: "20px", right: "20px", fontSize: "18px", fontWeight: "bold" }}>
+      {/* 학점 계산기 - 모바일에서 제목과 겹치지 않도록 조정 */}
+      <div style={{ position: "absolute", top: "60px", right: "20px", fontSize: "18px", fontWeight: "bold" }}>
         현재: {calculateCredits()}학점
       </div>
 
@@ -152,7 +152,7 @@ function App() {
       )}
 
       {/* 빈 시간표 */}
-      <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
+      <table border="1" style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse", marginBottom: "20px" }}>
         <thead>
           <tr>
             <th style={{ width: "50px", border: "1px solid black" }}>교시</th>
@@ -199,7 +199,7 @@ function App() {
       {Object.entries(courseData).map(([category, courses]) => (
         <div key={category}>
           <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
-          <table border="1">
+          <table border="1" style={{ margin: "auto", marginBottom: "20px" }}>
             <thead>
               <tr>
                 <th>과목명</th>
