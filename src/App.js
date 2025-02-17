@@ -194,6 +194,41 @@ function App() {
           ))}
         </tbody>
       </table>
+
+      {/* 수업 목록 유지 */}
+      {Object.entries(courseData).map(([category, courses]) => (
+        <div key={category}>
+          <h2 style={{ backgroundColor: categoryColors[category], padding: "5px" }}>{category}</h2>
+          <table border="1">
+            <thead>
+              <tr>
+                <th>과목명</th>
+                <th>교수</th>
+                <th>요일</th>
+                <th>교시</th>
+                <th>강의실</th>
+                <th>학점</th>
+                <th>추가</th>
+              </tr>
+            </thead>
+            <tbody>
+              {courses.map((course, index) => (
+                <tr key={index}>
+                  <td>{course.subject}</td>
+                  <td>{course.professor}</td>
+                  <td>{course.day}</td>
+                  <td>{course.period}</td>
+                  <td>{course.location}</td>
+                  <td>{course.credits}</td>
+                  <td>
+                    <button onClick={() => addToTimetable(course, category)}>추가</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
     </div>
   );
 }
