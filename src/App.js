@@ -33,10 +33,13 @@ function App() {
 
   const calculateCredits = () => {
     let totalCredits = 0;
+    const countedCourses = new Set();
+
     days.forEach((day) => {
       timetable[day].forEach((course) => {
-        if (course) {
+        if (course && !countedCourses.has(`${course.subject}-${day}`)) {
           totalCredits += course.credits;
+          countedCourses.add(`${course.subject}-${day}`);
         }
       });
     });
@@ -54,15 +57,14 @@ function App() {
 
     const startPeriod = parseInt(course.period.split("~")[0]) - 1;
     const endPeriod = parseInt(course.period.split("~")[1]) - 1;
-    const day = days.find((d) => d === course.day);
 
-    if (!day) {
+    if (!days.includes(course.day)) {
       showError("잘못된 요일 데이터입니다.");
       return;
     }
 
     for (let i = startPeriod; i <= endPeriod; i++) {
-      if (timetable[day][i] !== null) {
+      if (timetable[course.day][i] !== null) {
         showError("중복된 시간이 존재합니다.");
         return;
       }
@@ -71,7 +73,7 @@ function App() {
     setTimetable((prev) => {
       const newTimetable = { ...prev };
       for (let i = startPeriod; i <= endPeriod; i++) {
-        newTimetable[day][i] = { ...course, startPeriod, endPeriod, category };
+        newTimetable[course.day][i] = { ...course, startPeriod, endPeriod, category };
       }
       return newTimetable;
     });
@@ -100,47 +102,51 @@ function App() {
     <div style={{ position: "relative", textAlign: "center" }}>
       <h1 style={{ marginBottom: "40px" }}>정화예대 25-1 시간표 도우미</h1>
 
-      {/* 학점 계산기 */}
+      {/* 학점 계산기 - 모바일에서 제목과 겹치지 않도록 조정 */}
       <div style={{ position: "absolute", top: "60px", right: "20px", fontSize: "18px", fontWeight: "bold" }}>
         현재: {calculateCredits()}학점
       </div>
 
       {errorMessage && (
-        <div style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          background: "#ff4444",
-          color: "#fff",
-          padding: "15px",
-          borderRadius: "8px",
-          fontWeight: "bold",
-          zIndex: 1000,
-          textAlign: "center",
-          width: "300px",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "#ff4444",
+            color: "#fff",
+            padding: "15px",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            zIndex: 1000,
+            textAlign: "center",
+            width: "300px",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
+          }}
+        >
           {errorMessage}
         </div>
       )}
 
       {successMessage && (
-        <div style={{
-          position: "fixed",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          background: "#000",
-          color: "#fff",
-          padding: "15px",
-          borderRadius: "8px",
-          fontWeight: "bold",
-          zIndex: 1000,
-          textAlign: "center",
-          width: "300px",
-          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
-        }}>
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "#000",
+            color: "#fff",
+            padding: "15px",
+            borderRadius: "8px",
+            fontWeight: "bold",
+            zIndex: 1000,
+            textAlign: "center",
+            width: "300px",
+            boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)"
+          }}
+        >
           {successMessage}
         </div>
       )}
@@ -161,19 +167,26 @@ function App() {
               <td style={{ border: "1px solid black" }}>{period}교시</td>
               {days.map((day) => {
                 const course = timetable[day][period - 1];
-                return course ? (
-                  <td key={`${day}-${period}`} style={{
-                    cursor: "pointer",
-                    background: categoryColors[course.category],
-                    textAlign: "center",
-                    verticalAlign: "middle",
-                    fontWeight: "bold",
-                    border: "1px solid black",
-                    padding: "5px"
-                  }} rowSpan={course.endPeriod - course.startPeriod + 1} onClick={() => removeFromTimetable(day, period - 1)}>
+                const isStartPeriod = course && course.startPeriod === period - 1;
+                const bgColor = course ? categoryColors[course.category] : "#fff";
+                const fontSize = course && course.subject.length > 10 ? "12px" : "16px";
+
+                return isStartPeriod ? (
+                  <td
+                    key={`${day}-${period}`}
+                    style={{
+                      cursor: "pointer",
+                      background: bgColor,
+                      textAlign: "center",
+                      verticalAlign: "middle",
+                      fontWeight: "bold",
+                      border: "1px solid black",
+                      fontSize: fontSize,
+                    }}
+                    rowSpan={course.endPeriod - course.startPeriod + 1}
+                    onClick={() => removeFromTimetable(day, period - 1)}
+                  >
                     {course.subject}
-                    <br />
-                    <span style={{ fontSize: "12px", fontWeight: "normal" }}>{course.professor}</span>
                   </td>
                 ) : <td key={`${day}-${period}`} style={{ border: "1px solid black" }}></td>;
               })}
@@ -207,7 +220,9 @@ function App() {
                   <td>{course.period}</td>
                   <td>{course.location}</td>
                   <td>{course.credits}</td>
-                  <td><button onClick={() => addToTimetable(course, category)}>추가</button></td>
+                  <td>
+                    <button onClick={() => addToTimetable(course, category)}>추가</button>
+                  </td>
                 </tr>
               ))}
             </tbody>
